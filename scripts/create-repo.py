@@ -296,19 +296,32 @@ def generate_source_id(pkg: str) -> int:
 
 
 def create_repo_json(output_dir: str, repo_url: str) -> None:
-    """Create repo.json with repository metadata."""
+    """Create repo.json with repository metadata from template or default."""
     output_path = Path(output_dir)
+    script_dir = Path(__file__).parent
+    template_file = script_dir / "repo-template.json"
     
-    repo_info = {
-        "meta": {
-            "name": "Inkarr Extension Repository",
-            "shortName": "Inkarr",
-            "description": "Mihon extension for Inkarr - self-hosted manga/comic server",
-            "owner": "inkarr",
-            "website": "https://github.com/your-username/inkarr",
-            "support": "https://github.com/your-username/inkarr/issues"
+    # Try to use template file first
+    if template_file.exists():
+        repo_info = json.loads(template_file.read_text())
+        # Update URLs with actual repo URL base
+        if "meta" in repo_info:
+            base_url = repo_url.rsplit("/repo", 1)[0] if "/repo" in repo_url else repo_url
+            repo_info["meta"]["website"] = repo_info["meta"].get("website", "").replace(
+                "your-username", base_url.split("/")[-1] if "/" in base_url else "inkarr"
+            )
+    else:
+        # Default template
+        repo_info = {
+            "meta": {
+                "name": "Inkarr Extension Repository",
+                "shortName": "Inkarr",
+                "description": "Mihon extension for Inkarr - self-hosted manga/comic server",
+                "owner": "inkarr",
+                "website": "https://github.com/inkarr",
+                "support": "https://github.com/inkarr/issues"
+            }
         }
-    }
     
     repo_json = output_path / "repo.json"
     repo_json.write_text(json.dumps(repo_info, indent=2, ensure_ascii=False))
