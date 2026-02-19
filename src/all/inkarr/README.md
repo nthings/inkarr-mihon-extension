@@ -1,62 +1,78 @@
 # Inkarr Extension for Mihon
 
-A Mihon/Tachiyomi extension that connects to your self-hosted [Inkarr](https://github.com/your-repo/inkarr) server, allowing you to browse and read your manga/comic collection directly from the Mihon app.
+[![Build & Release](https://github.com/your-username/inkarr-mihon-extension/actions/workflows/release-inkarr.yml/badge.svg)](https://github.com/your-username/inkarr-mihon-extension/actions/workflows/release-inkarr.yml)
+
+A Mihon/Tachiyomi extension that connects to your self-hosted [Inkarr](https://github.com/your-username/inkarr) server, allowing you to browse and read your manga/comic collection directly from the Mihon app.
 
 ## Features
 
-- Browse your Inkarr library directly from Mihon
-- Read CBZ/CBR files streamed from your server
-- Support for series metadata (author, artist, genres, status)
-- API key authentication for secure access
-- Works on local network or remotely (port forwarding/VPN required)
+- 📚 Browse your Inkarr library directly from Mihon
+- 📖 Read CBZ/CBR files streamed from your server
+- 🏷️ Support for series metadata (author, artist, genres, status)
+- 🔐 API key authentication for secure access
+- 🌐 Works on local network or remotely (port forwarding/VPN)
 
 ## Requirements
 
-- A running Inkarr server
-- Mihon app (v0.5.0+) or compatible fork
+- A running Inkarr server (v1.0+)
+- Mihon app (v0.5.0+) or compatible fork (Tachiyomi, TachiJ2K, etc.)
 - Network connectivity to your Inkarr server
 
-## Installation
+---
 
-### Option 1: Add Repository (Recommended)
+## 📲 Installation
 
-1. Open Mihon
-2. Go to **Settings** → **Browse** → **Extension repos**
-3. Tap **Add** and enter the repository URL:
+### Option 1: Add Extension Repository (Recommended)
+
+This is the easiest method and enables automatic updates.
+
+1. **Open Mihon** on your Android device
+2. Navigate to: **Settings** → **Browse** → **Extension repos**
+3. Tap **➕ Add** and enter:
    ```
-   https://raw.githubusercontent.com/your-repo/inkarr-extension/repo/index.min.json
+   https://raw.githubusercontent.com/your-username/inkarr-mihon-extension/repo/index.min.json
    ```
 4. Go to **Browse** → **Extensions** tab
-5. Find "Inkarr" and tap **Install**
-6. Tap **Trust** when prompted
+5. Search for **"Inkarr"** and tap **Install**
+6. When prompted, tap **Trust** to enable the extension
 
-### Option 2: Manual APK Installation
+> **⚠️ Security Note:** Mihon requires trusting third-party extensions as a security measure. This allows the extension to make network requests to your Inkarr server.
 
-1. Download the latest APK from the releases page
-2. Install the APK on your Android device
-3. Open Mihon and trust the extension
+### Option 2: Direct APK Installation
 
-## Configuration
+1. Download the latest APK from [Releases](https://github.com/your-username/inkarr-mihon-extension/releases)
+2. Install the APK on your device (enable "Install from unknown sources" if needed)
+3. Open Mihon → **Browse** → **Extensions** → Trust the extension
 
-After installing the extension:
+---
+
+## ⚙️ Configuration
+
+After installation, configure the extension to connect to your server:
 
 1. Go to **Browse** → **Extensions**
-2. Long press on "Inkarr" and tap **Settings**
-3. Configure the following:
+2. Long press on **"Inkarr"** and tap **Settings**
+3. Configure:
 
-| Setting | Description |
-|---------|-------------|
-| **Server Address** | Your Inkarr server URL (e.g., `http://192.168.1.100:3000`) |
-| **API Key** | Your Inkarr API key (optional, for authenticated access) |
+| Setting | Description | Example |
+|---------|-------------|---------|
+| **Server Address** | Your Inkarr server URL | `http://192.168.1.100:3000` |
+| **API Key** | Authentication key (optional) | `abc123...` |
 
-> **Note:** The server address must NOT end with a trailing slash.
+### Important Notes
 
-## Building from Source
+- ❌ Server address must **NOT** end with `/`
+- ✅ Use `http://` for local networks, `https://` for remote access
+- 🔄 Restart Mihon after changing settings
+
+---
+
+## 🏗️ Building from Source
 
 ### Prerequisites
 
 - JDK 17+
-- Android SDK
+- Android SDK with build-tools
 - Git
 
 ### Clone the Repository

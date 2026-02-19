@@ -1,0 +1,225 @@
+name: Build & Release Inkarr Extension
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/all/inkarr/**'
+      - '.github/workflows/release-inkarr.yml'
+      - 'scripts/create-repo.py'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      skip_signing:
+        description: 'Skip APK signing (for testing)'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-inkarr-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: 17
+  EXTENSION_PATH: src/all/inkarr
+  REPO_BRANCH: repo
+
+jobs:
+  build:
+    name: Build Inkarr Extension
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      apk_path: ${{ steps.find-apk.outputs.path }}
+      version: ${{ steps.find-apk.outputs.version }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Prepare signing key
+        if: ${{ github.event.inputs.skip_signing != 'true' && secrets.SIGNING_KEY != '' }}
+        run: |
+          echo "${{ secrets.SIGNING_KEY }}" | base64 -d > signingkey.jks
+
+      - name: Build Release APK
+        env:
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -f signingkey.jks ]; then
+            ./gradlew :${{ env.EXTENSION_PATH }}:assembleRelease
+          else
+            echo "No signing key found, building debug APK"
+            ./gradlew :${{ env.EXTENSION_PATH }}:assembleDebug
+          fi
+
+      - name: Find built APK
+        id: find-apk
+        run: |
+          APK_PATH=$(find ${{ env.EXTENSION_PATH }}/build/outputs/apk -name "*.apk" | head -1)
+          echo "path=$APK_PATH" >> $GITHUB_OUTPUT
+          
+          # Extract version from APK filename
+          VERSION=$(basename "$APK_PATH" | grep -oP 'v[\d.]+' | head -1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          echo "Found APK: $APK_PATH"
+          echo "Version: $VERSION"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: inkarr-apk
+          path: ${{ steps.find-apk.outputs.path }}
+          retention-days: 30
+
+      - name: Clean up signing key
+        if: always()
+        run: rm -f signingkey.jks
+
+  publish:
+    name: Publish to Repository
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: inkarr-apk
+          path: main/${{ env.EXTENSION_PATH }}/build/outputs/apk/release
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Android SDK build-tools
+        run: |
+          # Install aapt2 for APK inspection
+          sudo apt-get update
+          sudo apt-get install -y google-android-build-tools-installer || true
+          
+          # Alternative: Download aapt2 directly
+          if ! command -v aapt2 &> /dev/null; then
+            echo "Installing aapt2 from Android SDK..."
+            mkdir -p ~/android-sdk/build-tools/34.0.0
+            curl -L "https://dl.google.com/android/repository/build-tools_r34-linux.zip" -o /tmp/build-tools.zip
+            unzip -q /tmp/build-tools.zip -d /tmp/build-tools
+            cp /tmp/build-tools/android-14/aapt2 ~/android-sdk/build-tools/34.0.0/ || true
+            chmod +x ~/android-sdk/build-tools/34.0.0/aapt2 || true
+            echo "$HOME/android-sdk/build-tools/34.0.0" >> $GITHUB_PATH
+          fi
+
+      - name: Generate repository index
+        run: |
+          cd main
+          python scripts/create-repo.py \
+            --apk-dir "${{ env.EXTENSION_PATH }}/build/outputs/apk/release" \
+            --output-dir repo \
+            --repo-url "https://raw.githubusercontent.com/${{ github.repository }}/repo"
+
+      - name: Checkout repo branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.REPO_BRANCH }}
+          path: repo-branch
+        continue-on-error: true
+
+      - name: Create repo branch if not exists
+        run: |
+          if [ ! -d "repo-branch" ]; then
+            mkdir -p repo-branch
+            cd repo-branch
+            git init
+            git checkout -b ${{ env.REPO_BRANCH }}
+          fi
+
+      - name: Deploy to repo branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd repo-branch
+          
+          # Copy generated files
+          cp -r ../main/repo/* . 2>/dev/null || true
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Add and commit
+          git add -A
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update Inkarr extension ${{ needs.build.outputs.version }}"
+            
+            # Push to repo branch
+            git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+            git push -u origin ${{ env.REPO_BRANCH }} --force
+            
+            echo "✓ Published to repo branch"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## 📦 Inkarr Extension Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ needs.build.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📲 Installation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Add this repository URL to Mihon:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "https://raw.githubusercontent.com/${{ github.repository }}/repo/index.min.json" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+  release-assets:
+    name: Upload Release Assets
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: inkarr-apk
+          path: apk
+
+      - name: Upload APK to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: apk/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
