@@ -28,6 +28,7 @@ concurrency:
 env:
   JAVA_VERSION: 17
   EXTENSION_PATH: src/all/inkarr
+  GRADLE_PROJECT: src:all:inkarr
   REPO_BRANCH: repo
 
 jobs:
@@ -72,10 +73,10 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           if [ -f signingkey.jks ]; then
-            ./gradlew :${{ env.EXTENSION_PATH }}:assembleRelease
+            ./gradlew :${{ env.GRADLE_PROJECT }}:assembleRelease
           else
             echo "No signing key found, building debug APK"
-            ./gradlew :${{ env.EXTENSION_PATH }}:assembleDebug
+            ./gradlew :${{ env.GRADLE_PROJECT }}:assembleDebug
           fi
 
       - name: Find built APK
