@@ -1,33 +1,48 @@
-# Keiyoushi Extensions
+# Inkarr Mihon Extension
 
-### Please give the repo a :star:
+A [Mihon](https://github.com/mihonapp/mihon) extension for [Inkarr](https://github.com/your-username/inkarr), the self-hosted manga and comic server.
 
-| Build                                                                                                                                                                               | Need Help?                                                                                                                                              |
-|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [![CI](https://github.com/keiyoushi/extensions-source/actions/workflows/build_push.yml/badge.svg)](https://github.com/keiyoushi/extensions-source/actions/workflows/build_push.yml) | [![Discord](https://img.shields.io/discord/1193460528052453448.svg?label=discord&labelColor=7289da&color=2c2f33&style=flat)](https://discord.gg/3FbCpdKbdY) |
+## Installation
 
-## Usage
-**If you are new to repository/extensions, please read the [Keiyoushi Getting Started guide](https://keiyoushi.github.io/docs/guides/getting-started#adding-the-extension-repo) first.**
+### Add the Repository
 
-* You can add our repo by visiting the [Keiyoushi Website](https://keiyoushi.github.io/add-repo)
-* Otherwise, copy & paste the following URL: https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.min.json
+1. Open Mihon
+2. Go to **Settings** → **Browse** → **Extension repos**
+3. Tap **Add** and enter:
+   ```
+   https://raw.githubusercontent.com/YOUR_USERNAME/inkarr-mihon-extension/repo/index.min.json
+   ```
 
-## Requests
+### Install the Extension
 
-To request a new source or bug fix, [create an issue](https://github.com/keiyoushi/extensions-source/issues/new/choose).
+1. Go to **Browse** → **Extensions**
+2. Find **Inkarr** in the list
+3. Tap **Install**
 
-Please note that creating an issue does not mean that the source will be added or fixed in a timely
-fashion, because the work is volunteer-based. Some sources may also be impossible to do or prohibitively
-difficult to maintain.
+## Configuration
 
-If you would like to see a request fulfilled and have the necessary skills to do so, consider contributing!
-Issues are up-for-grabs for any developer if there is no assigned user already.
+After installing, configure the extension:
 
-## Contributing
+1. Go to **Browse** → **Extensions**
+2. Tap the gear icon next to **Inkarr**
+3. Set your **Server URL** (e.g., `http://192.168.1.100:3000`)
+4. Set your **API Key** (from Inkarr Settings → API Keys)
 
-Contributions are welcome!
+## Features
 
-Check out the repo's [issue backlog](https://github.com/keiyoushi/extensions-source/issues) for source requests and bug reports.
+- Browse your Inkarr manga/comic library
+- Search across all series
+- View chapter lists and read chapters
+- Automatic page ordering
+- Secure API key authentication
+
+## Building
+
+```bash
+./gradlew :src:all:inkarr:assembleDebug
+```
+
+The APK will be in `src/all/inkarr/build/outputs/apk/debug/`.
 
 ## License
 
@@ -45,9 +60,6 @@ Check out the repo's [issue backlog](https://github.com/keiyoushi/extensions-sou
     See the License for the specific language governing permissions and
     limitations under the License.
 
-## Disclaimer
+## Credits
 
-This project does not have any affiliation with the content providers available.
-
-This project is not affiliated with Mihon/Tachiyomi. Don't ask for help about these extensions at the
-official support means of Mihon/Tachiyomi. All credits to the codebase goes to the original contributors.
+Build system based on [Keiyoushi/extensions-source](https://github.com/keiyoushi/extensions-source).
