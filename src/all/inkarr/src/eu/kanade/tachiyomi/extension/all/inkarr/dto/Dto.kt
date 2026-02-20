@@ -63,23 +63,19 @@ data class SeriesDto(
         }
     }
 
-    private fun getAuthors(): String? {
-        return creators
-            ?.filter { it.creator?.metadata?.role?.lowercase() in listOf("writer", "author", "story") }
-            ?.mapNotNull { it.creator?.metadata?.name }
-            ?.distinct()
-            ?.joinToString(", ")
-            ?.takeIf { it.isNotBlank() }
-    }
+    private fun getAuthors(): String? = creators
+        ?.filter { it.creator?.metadata?.role?.lowercase() in listOf("writer", "author", "story") }
+        ?.mapNotNull { it.creator?.metadata?.name }
+        ?.distinct()
+        ?.joinToString(", ")
+        ?.takeIf { it.isNotBlank() }
 
-    private fun getArtists(): String? {
-        return creators
-            ?.filter { it.creator?.metadata?.role?.lowercase() in listOf("artist", "penciller", "illustrator", "art") }
-            ?.mapNotNull { it.creator?.metadata?.name }
-            ?.distinct()
-            ?.joinToString(", ")
-            ?.takeIf { it.isNotBlank() }
-    }
+    private fun getArtists(): String? = creators
+        ?.filter { it.creator?.metadata?.role?.lowercase() in listOf("artist", "penciller", "illustrator", "art") }
+        ?.mapNotNull { it.creator?.metadata?.name }
+        ?.distinct()
+        ?.joinToString(", ")
+        ?.takeIf { it.isNotBlank() }
 
     private fun parseStatus(status: String?): Int = when (status?.lowercase()) {
         "ongoing", "continuing" -> SManga.ONGOING
@@ -162,12 +158,10 @@ data class ChapterDto(
         }
     }
 
-    private fun formatNumber(number: Float): String {
-        return if (number == number.toLong().toFloat()) {
-            number.toLong().toString()
-        } else {
-            number.toString()
-        }
+    private fun formatNumber(number: Float): String = if (number == number.toLong().toFloat()) {
+        number.toLong().toString()
+    } else {
+        number.toString()
     }
 
     private fun parseDate(dateString: String?): Long {

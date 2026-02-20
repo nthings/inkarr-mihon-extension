@@ -8,7 +8,6 @@ import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceScreen
 import eu.kanade.tachiyomi.extension.all.inkarr.dto.ChapterDto
 import eu.kanade.tachiyomi.extension.all.inkarr.dto.MediaFileDto
-import eu.kanade.tachiyomi.extension.all.inkarr.dto.PageDto
 import eu.kanade.tachiyomi.extension.all.inkarr.dto.SeriesDto
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.source.ConfigurableSource
@@ -35,7 +34,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-class Inkarr : HttpSource(), ConfigurableSource, UnmeteredSource {
+class Inkarr :
+    HttpSource(),
+    ConfigurableSource,
+    UnmeteredSource {
 
     internal val preferences: SharedPreferences by getPreferencesLazy()
 
@@ -153,9 +155,7 @@ class Inkarr : HttpSource(), ConfigurableSource, UnmeteredSource {
 
     // ========================= Chapter List =========================
 
-    override fun getChapterUrl(chapter: SChapter): String {
-        return "$baseUrl/series/${chapter.url.split("/")[2]}"
-    }
+    override fun getChapterUrl(chapter: SChapter): String = "$baseUrl/series/${chapter.url.split("/")[2]}"
 
     override fun chapterListRequest(manga: SManga): Request {
         val url = "$baseUrl${manga.url}"
@@ -224,12 +224,9 @@ class Inkarr : HttpSource(), ConfigurableSource, UnmeteredSource {
         }
     }
 
-    override fun imageUrlParse(response: Response): String =
-        throw UnsupportedOperationException("imageUrlParse is not used")
+    override fun imageUrlParse(response: Response): String = throw UnsupportedOperationException("imageUrlParse is not used")
 
-    override fun imageRequest(page: Page): Request {
-        return GET(page.imageUrl!!, headersBuilder().add("Accept", "image/*,*/*;q=0.8").build())
-    }
+    override fun imageRequest(page: Page): Request = GET(page.imageUrl!!, headersBuilder().add("Accept", "image/*,*/*;q=0.8").build())
 
     // ========================= Preferences =========================
 
