@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "name": "Inkarr Extension Repository",
+    "shortName": "Inkarr",
+    "description": "Mihon extension for Inkarr - a self-hosted manga and comic server following the servarr philosophy. Allows browsing and reading your personal comic collection from Mihon/Tachiyomi.",
+    "owner": "inkarr",
+    "website": "https://github.com/inkarr-mihon-extension/inkarr",
+    "support": "https://github.com/your-username/inkarr/issues",
+    "icon": "https://raw.githubusercontent.com/your-username/inkarr-mihon-extension/repo/icon/eu.kanade.tachiyomi.extension.all.inkarr.png"
+  },
+  "extensions": {
+    "minApp": "0.5.0",
+    "notes": [
+      "This extension requires a running Inkarr server",
+      "Configure your server address and API key in extension settings",
+      "Works on local network or remotely with port forwarding"
+    ]
+  }
+}
