@@ -152,34 +152,27 @@ jobs:
             --output-dir repo \
             --repo-url "https://raw.githubusercontent.com/${{ github.repository }}/repo"
 
-      - name: Checkout repo branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.REPO_BRANCH }}
-          path: repo-branch
-        continue-on-error: true
-
-      - name: Create repo branch if not exists
-        run: |
-          if [ ! -d "repo-branch" ]; then
-            mkdir -p repo-branch
-            cd repo-branch
-            git init
-            git checkout -b ${{ env.REPO_BRANCH }}
-          fi
-
-      - name: Deploy to repo branch
+      - name: Setup and deploy to repo branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Setup repo-branch directory
+          rm -rf repo-branch
+          mkdir -p repo-branch
           cd repo-branch
+          
+          # Initialize git and configure
+          git init -b ${{ env.REPO_BRANCH }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          
+          # Try to fetch existing repo branch content
+          git fetch origin ${{ env.REPO_BRANCH }} --depth=1 2>/dev/null && \
+            git reset --soft FETCH_HEAD 2>/dev/null || true
           
           # Copy generated files
           cp -r ../main/repo/* . 2>/dev/null || true
-          
-          # Configure git
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           
           # Add and commit
           git add -A
@@ -188,11 +181,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Update Inkarr extension ${{ needs.build.outputs.version }}"
-            
-            # Push to repo branch
-            git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
             git push -u origin ${{ env.REPO_BRANCH }} --force
-            
             echo "✓ Published to repo branch"
           fi
 
