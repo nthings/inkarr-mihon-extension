@@ -256,9 +256,8 @@ def generate_index(
         extension["sources"] = [{
             "name": info["name"],
             "lang": lang,
-            "id": generate_source_id(info["pkg"]),
-            "baseUrl": "",
-            "versionId": info["code"]
+            "id": str(generate_source_id(info["pkg"])),
+            "baseUrl": ""
         }]
         
         extensions.append(extension)
