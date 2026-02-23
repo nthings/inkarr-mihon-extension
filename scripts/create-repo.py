@@ -224,8 +224,11 @@ def generate_index(
             print("Warning: aapt not found, using fallback extraction", file=sys.stderr)
             info = extract_apk_info_zipfile(str(apk_file))
         
-        # Generate APK filename for repo
-        apk_name = f"tachiyomi-{info['pkg'].split('.')[-1]}-v{info['version']}.apk"
+        # Generate APK filename for repo (format: tachiyomi-{lang}.{name}-v{version}.apk)
+        pkg_parts = info['pkg'].split('.')
+        lang = pkg_parts[-2] if len(pkg_parts) >= 2 else "all"  # e.g., "all" from eu.kanade.tachiyomi.extension.all.inkarr
+        short_name = pkg_parts[-1]  # e.g., "inkarr"
+        apk_name = f"tachiyomi-{lang}.{short_name}-v{info['version']}.apk"
         
         # Copy APK to output directory
         dest_apk = apk_output_dir / apk_name
@@ -237,10 +240,10 @@ def generate_index(
         
         # Build extension entry
         extension = {
-            "name": info["name"],
+            "name": f"Tachiyomi: {info['name']}",
             "pkg": info["pkg"],
             "apk": apk_name,
-            "lang": "all",
+            "lang": lang,
             "code": info["code"],
             "version": info["version"],
             "nsfw": info["nsfw"],
