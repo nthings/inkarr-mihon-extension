@@ -2,7 +2,7 @@
   {
     "name": "Inkarr",
     "pkg": "eu.kanade.tachiyomi.extension.all.inkarr",
-    "apk": "apk/tachiyomi-inkarr-v1.4.1.apk",
+    "apk": "tachiyomi-inkarr-v1.4.1.apk",
     "lang": "all",
     "code": 1,
     "version": "1.4.1",
@@ -11,7 +11,7 @@
       {
         "name": "Inkarr",
         "lang": "all",
-        "id": 5178593107950509259,
+        "id": "5178593107950509259",
         "baseUrl": ""
       }
     ]
