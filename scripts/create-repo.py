@@ -255,9 +255,10 @@ def generate_index(
         # Add sources info (required by newer Mihon versions)
         extension["sources"] = [{
             "name": info["name"],
-            "lang": "all",
+            "lang": lang,
             "id": generate_source_id(info["pkg"]),
-            "baseUrl": ""
+            "baseUrl": "",
+            "versionId": info["code"]
         }]
         
         extensions.append(extension)
