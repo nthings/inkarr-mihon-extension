@@ -1,6 +1,7 @@
 {
   "meta": {
     "name": "Inkarr",
-    "website": "https://github.com/nthings/inkarr-mihon-extension"
+    "website": "https://github.com/nthings/inkarr-mihon-extension",
+    "signingKeyFingerprint": "d49f4205651d103762cd76c42b8a9c99e6a7477526afb6da35df411c2de109ec"
   }
 }
