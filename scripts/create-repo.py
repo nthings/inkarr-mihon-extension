@@ -287,7 +287,7 @@ def generate_index(
     return final_index
 
 
-def generate_source_id(pkg: str) -> str:
+def generate_source_id(pkg: str) -> int:
     """Generate a stable source ID from package name (matches Mihon's algorithm)."""
     import hashlib
     key = f"{pkg}/all/1"
@@ -296,7 +296,7 @@ def generate_source_id(pkg: str) -> str:
     result = 0
     for i in range(8):
         result = (result << 8) | md5[i]
-    return str(result & 0x7FFFFFFFFFFFFFFF)
+    return result & 0x7FFFFFFFFFFFFFFF
 
 
 def create_repo_json(output_dir: str, repo_url: str) -> None:
