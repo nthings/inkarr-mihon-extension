@@ -28,7 +28,7 @@ from typing import Any, Optional
 # Default configuration
 DEFAULT_APK_DIR = "src/all/inkarr/build/outputs/apk/release"
 DEFAULT_OUTPUT_DIR = "repo"
-DEFAULT_REPO_URL = "https://raw.githubusercontent.com/your-username/inkarr-mihon-extension/repo"
+DEFAULT_REPO_URL = "https://raw.githubusercontent.com/nthings/inkarr-mihon-extension/repo"
 
 
 def find_aapt() -> Optional[str]:
@@ -239,7 +239,7 @@ def generate_index(
         extension = {
             "name": info["name"],
             "pkg": info["pkg"],
-            "apk": apk_name,
+            "apk": f"apk/{apk_name}",
             "lang": "all",
             "code": info["code"],
             "version": info["version"],
